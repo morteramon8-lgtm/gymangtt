@@ -1,0 +1,83 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1790287909105,
+      "tag": "0000_gym_schema_initial",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1790294987931,
+      "tag": "0001_payments_integrity_void_audit",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1790298714446,
+      "tag": "0002_dates_argentina_policy",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1790387135842,
+      "tag": "0003_dates_argentina_policy",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1790387276124,
+      "tag": "0004_expiry_scan_function",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1790387293233,
+      "tag": "0005_data_validation_constraints",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1790567957860,
+      "tag": "0006_member_routine_history",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1790568793379,
+      "tag": "0007_drop_settings_compat_views",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1790722949479,
+      "tag": "0008_apply_imported_gym_migrations",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1790726513761,
+      "tag": "0009_member_self_check_in",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1790728509019,
+      "tag": "0010_gym_isolation_guards",
+      "breakpoints": true
+    }
+  ]
+}

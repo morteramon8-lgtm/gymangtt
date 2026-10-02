@@ -1,0 +1,1 @@
+REVOKE EXECUTE ON FUNCTION public.routines_owner_guard() FROM PUBLIC, anon, authenticated;
