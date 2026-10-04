@@ -16,6 +16,7 @@ import { Route as AuthenticatedAsistenciasRouteImport } from './routes/_authenti
 import { Route as AuthenticatedAvisosRouteImport } from './routes/_authenticated/avisos'
 import { Route as AuthenticatedConfiguracionRouteImport } from './routes/_authenticated/configuracion'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedGruposRouteImport } from './routes/_authenticated/grupos'
 import { Route as AuthenticatedMiCuentaRouteImport } from './routes/_authenticated/mi-cuenta'
 import { Route as AuthenticatedMiRutinaRouteImport } from './routes/_authenticated/mi-rutina'
 import { Route as AuthenticatedMisPagosRouteImport } from './routes/_authenticated/mis-pagos'
@@ -23,6 +24,7 @@ import { Route as AuthenticatedMisRutinasRouteImport } from './routes/_authentic
 import { Route as AuthenticatedPagosRouteImport } from './routes/_authenticated/pagos'
 import { Route as AuthenticatedRutinasRouteImport } from './routes/_authenticated/rutinas'
 import { Route as AuthenticatedSociosRouteImport } from './routes/_authenticated/socios'
+import { Route as AuthenticatedGruposIdRouteImport } from './routes/_authenticated/grupos_.$id'
 import { Route as AuthenticatedSociosIdRouteImport } from './routes/_authenticated/socios_.$id'
 
 const IndexRoute = IndexRouteImport.update({
@@ -61,6 +63,11 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedGruposRoute = AuthenticatedGruposRouteImport.update({
+  id: '/grupos',
+  path: '/grupos',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedMiCuentaRoute = AuthenticatedMiCuentaRouteImport.update({
   id: '/mi-cuenta',
   path: '/mi-cuenta',
@@ -96,6 +103,11 @@ const AuthenticatedSociosRoute = AuthenticatedSociosRouteImport.update({
   path: '/socios',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedGruposIdRoute = AuthenticatedGruposIdRouteImport.update({
+  id: '/grupos_/$id',
+  path: '/grupos/$id',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedSociosIdRoute = AuthenticatedSociosIdRouteImport.update({
   id: '/socios_/$id',
   path: '/socios/$id',
@@ -109,6 +121,7 @@ export interface FileRoutesByFullPath {
   '/avisos': typeof AuthenticatedAvisosRoute
   '/configuracion': typeof AuthenticatedConfiguracionRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/grupos': typeof AuthenticatedGruposRoute
   '/mi-cuenta': typeof AuthenticatedMiCuentaRoute
   '/mi-rutina': typeof AuthenticatedMiRutinaRoute
   '/mis-pagos': typeof AuthenticatedMisPagosRoute
@@ -116,6 +129,7 @@ export interface FileRoutesByFullPath {
   '/pagos': typeof AuthenticatedPagosRoute
   '/rutinas': typeof AuthenticatedRutinasRoute
   '/socios': typeof AuthenticatedSociosRoute
+  '/grupos/$id': typeof AuthenticatedGruposIdRoute
   '/socios/$id': typeof AuthenticatedSociosIdRoute
 }
 export interface FileRoutesByTo {
@@ -125,6 +139,7 @@ export interface FileRoutesByTo {
   '/avisos': typeof AuthenticatedAvisosRoute
   '/configuracion': typeof AuthenticatedConfiguracionRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/grupos': typeof AuthenticatedGruposRoute
   '/mi-cuenta': typeof AuthenticatedMiCuentaRoute
   '/mi-rutina': typeof AuthenticatedMiRutinaRoute
   '/mis-pagos': typeof AuthenticatedMisPagosRoute
@@ -132,6 +147,7 @@ export interface FileRoutesByTo {
   '/pagos': typeof AuthenticatedPagosRoute
   '/rutinas': typeof AuthenticatedRutinasRoute
   '/socios': typeof AuthenticatedSociosRoute
+  '/grupos/$id': typeof AuthenticatedGruposIdRoute
   '/socios/$id': typeof AuthenticatedSociosIdRoute
 }
 export interface FileRoutesById {
@@ -143,6 +159,7 @@ export interface FileRoutesById {
   '/_authenticated/avisos': typeof AuthenticatedAvisosRoute
   '/_authenticated/configuracion': typeof AuthenticatedConfiguracionRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/grupos': typeof AuthenticatedGruposRoute
   '/_authenticated/mi-cuenta': typeof AuthenticatedMiCuentaRoute
   '/_authenticated/mi-rutina': typeof AuthenticatedMiRutinaRoute
   '/_authenticated/mis-pagos': typeof AuthenticatedMisPagosRoute
@@ -150,6 +167,7 @@ export interface FileRoutesById {
   '/_authenticated/pagos': typeof AuthenticatedPagosRoute
   '/_authenticated/rutinas': typeof AuthenticatedRutinasRoute
   '/_authenticated/socios': typeof AuthenticatedSociosRoute
+  '/_authenticated/grupos_/$id': typeof AuthenticatedGruposIdRoute
   '/_authenticated/socios_/$id': typeof AuthenticatedSociosIdRoute
 }
 export interface FileRouteTypes {
@@ -161,6 +179,7 @@ export interface FileRouteTypes {
     | '/avisos'
     | '/configuracion'
     | '/dashboard'
+    | '/grupos'
     | '/mi-cuenta'
     | '/mi-rutina'
     | '/mis-pagos'
@@ -168,6 +187,7 @@ export interface FileRouteTypes {
     | '/pagos'
     | '/rutinas'
     | '/socios'
+    | '/grupos/$id'
     | '/socios/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -177,6 +197,7 @@ export interface FileRouteTypes {
     | '/avisos'
     | '/configuracion'
     | '/dashboard'
+    | '/grupos'
     | '/mi-cuenta'
     | '/mi-rutina'
     | '/mis-pagos'
@@ -184,6 +205,7 @@ export interface FileRouteTypes {
     | '/pagos'
     | '/rutinas'
     | '/socios'
+    | '/grupos/$id'
     | '/socios/$id'
   id:
     | '__root__'
@@ -194,6 +216,7 @@ export interface FileRouteTypes {
     | '/_authenticated/avisos'
     | '/_authenticated/configuracion'
     | '/_authenticated/dashboard'
+    | '/_authenticated/grupos'
     | '/_authenticated/mi-cuenta'
     | '/_authenticated/mi-rutina'
     | '/_authenticated/mis-pagos'
@@ -201,6 +224,7 @@ export interface FileRouteTypes {
     | '/_authenticated/pagos'
     | '/_authenticated/rutinas'
     | '/_authenticated/socios'
+    | '/_authenticated/grupos_/$id'
     | '/_authenticated/socios_/$id'
   fileRoutesById: FileRoutesById
 }
@@ -261,6 +285,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/grupos': {
+      id: '/_authenticated/grupos'
+      path: '/grupos'
+      fullPath: '/grupos'
+      preLoaderRoute: typeof AuthenticatedGruposRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/mi-cuenta': {
       id: '/_authenticated/mi-cuenta'
       path: '/mi-cuenta'
@@ -310,6 +341,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSociosRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/grupos_/$id': {
+      id: '/_authenticated/grupos_/$id'
+      path: '/grupos/$id'
+      fullPath: '/grupos/$id'
+      preLoaderRoute: typeof AuthenticatedGruposIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/socios_/$id': {
       id: '/_authenticated/socios_/$id'
       path: '/socios/$id'
@@ -325,6 +363,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAvisosRoute: typeof AuthenticatedAvisosRoute
   AuthenticatedConfiguracionRoute: typeof AuthenticatedConfiguracionRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedGruposRoute: typeof AuthenticatedGruposRoute
   AuthenticatedMiCuentaRoute: typeof AuthenticatedMiCuentaRoute
   AuthenticatedMiRutinaRoute: typeof AuthenticatedMiRutinaRoute
   AuthenticatedMisPagosRoute: typeof AuthenticatedMisPagosRoute
@@ -332,6 +371,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedPagosRoute: typeof AuthenticatedPagosRoute
   AuthenticatedRutinasRoute: typeof AuthenticatedRutinasRoute
   AuthenticatedSociosRoute: typeof AuthenticatedSociosRoute
+  AuthenticatedGruposIdRoute: typeof AuthenticatedGruposIdRoute
   AuthenticatedSociosIdRoute: typeof AuthenticatedSociosIdRoute
 }
 
@@ -340,6 +380,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAvisosRoute: AuthenticatedAvisosRoute,
   AuthenticatedConfiguracionRoute: AuthenticatedConfiguracionRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedGruposRoute: AuthenticatedGruposRoute,
   AuthenticatedMiCuentaRoute: AuthenticatedMiCuentaRoute,
   AuthenticatedMiRutinaRoute: AuthenticatedMiRutinaRoute,
   AuthenticatedMisPagosRoute: AuthenticatedMisPagosRoute,
@@ -347,6 +388,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedPagosRoute: AuthenticatedPagosRoute,
   AuthenticatedRutinasRoute: AuthenticatedRutinasRoute,
   AuthenticatedSociosRoute: AuthenticatedSociosRoute,
+  AuthenticatedGruposIdRoute: AuthenticatedGruposIdRoute,
   AuthenticatedSociosIdRoute: AuthenticatedSociosIdRoute,
 }
 
