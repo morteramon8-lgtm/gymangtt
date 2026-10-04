@@ -8,6 +8,7 @@ import {
   Dumbbell,
   Settings,
   UserCircle,
+  UsersRound,
   LogOut,
   BellRing,
   CalendarCheck,
@@ -64,6 +65,7 @@ const ADMIN_LINKS: { section: string; items: NavLink[] }[] = [
       { to: "/socios", label: "Socios", note: "Miembros", icon: <Users className="nav-icon" /> },
       { to: "/pagos", label: "Pagos", note: "Cobros", icon: <CreditCard className="nav-icon" /> },
       { to: "/rutinas", label: "Rutinas", note: "Entrenamiento", icon: <Dumbbell className="nav-icon" /> },
+      { to: "/grupos", label: "Grupos", note: "Entrenamiento", icon: <UsersRound className="nav-icon" /> },
       { to: "/asistencias", label: "Asistencias", note: "Accesos", icon: <CalendarCheck className="nav-icon" /> },
       { to: "/avisos", label: "Avisos", note: "Alertas", icon: <BellRing className="nav-icon" /> },
     ],
@@ -83,6 +85,7 @@ const MEMBER_LINKS: { section: string; items: NavLink[] }[] = [
       { to: "/mi-cuenta", label: "Mi perfil", note: "Datos personales", icon: <UserCircle className="nav-icon" /> },
       { to: "/mi-rutina", label: "Mi rutina", note: "Entrenamiento", icon: <Dumbbell className="nav-icon" /> },
       { to: "/mis-rutinas", label: "Mis rutinas", note: "Creadas por mí", icon: <Dumbbell className="nav-icon" /> },
+      { to: "/grupos", label: "Grupos", note: "Entrenar juntos", icon: <UsersRound className="nav-icon" /> },
       { to: "/mis-pagos", label: "Mis pagos", note: "Historial", icon: <CreditCard className="nav-icon" /> },
     ],
   },
@@ -128,7 +131,7 @@ export function AppShell({
                 <Link
                   key={item.to}
                   to={item.to}
-                  className={`nav-item ${pathname === item.to ? "active" : ""}`}
+                  className={`nav-item ${pathname === item.to || (item.to === "/grupos" && pathname.startsWith("/grupos/")) ? "active" : ""}`}
                   onClick={() => setMenuOpen(false)}
                 >
                   <span className="nav-number">{String(groups.slice(0, groupIndex).reduce((n, g) => n + g.items.length, 0) + itemIndex + 1).padStart(2, "0")}</span>
