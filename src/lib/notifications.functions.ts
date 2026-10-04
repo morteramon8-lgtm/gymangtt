@@ -193,12 +193,26 @@ export const myNotifications = createServerFn({ method: "GET" })
       unwrap(
         await ctx.supabase
           .from("notifications")
-          .select("id, kind, title, body, status, read_at, created_at")
+          .select("id, kind, title, body, status, read_at, created_at, group_id, invitation_id")
           .eq("user_id", ctx.userId)
           .order("created_at", { ascending: false })
           .limit(50),
       ) ?? [];
-    return { rows, unread: rows.filter((r) => !r.read_at).length };
+    // Estado real de las invitaciones a grupos (la base sólo deja ver las propias).
+    const invIds = rows.map((r) => r.invitation_id).filter((v): v is string => Boolean(v));
+    const invitationStatus: Record<string, string> = {};
+    if (invIds.length > 0) {
+      const loose = ctx.supabase as unknown as {
+        from: (t: string) => {
+          select: (c: string) => {
+            in: (c: string, v: string[]) => Promise<{ data: { id: string; status: string }[] | null }>;
+          };
+        };
+      };
+      const inv = await loose.from("training_group_invitations").select("id, status").in("id", invIds);
+      for (const i of inv.data ?? []) invitationStatus[i.id] = i.status;
+    }
+    return { rows, unread: rows.filter((r) => !r.read_at).length, invitationStatus };
   });
 
 export const markNotificationRead = createServerFn({ method: "POST" })
