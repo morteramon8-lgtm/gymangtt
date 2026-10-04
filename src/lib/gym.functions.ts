@@ -574,6 +574,7 @@ export const listRoutines = createServerFn({ method: "GET" })
         .select(
           "*, routine_exercises(id, name, sets, reps, position), member_routines(member_id, members(first_name, last_name)), owner:members!routines_member_id_fkey(id, first_name, last_name)",
         )
+        .is("group_id", null)
         .order("created_at", { ascending: false }),
     );
     return rows ?? [];
@@ -721,6 +722,7 @@ export const listMyRoutines = createServerFn({ method: "GET" })
         .select("id, name, kind, notes, created_at, updated_at, routine_exercises(id, name, sets, reps, weight, rest, position)")
         .eq("created_by_role", "member")
         .eq("member_id", memberId)
+        .is("group_id", null)
         .order("created_at", { ascending: false }),
     );
     return rows ?? [];
@@ -939,7 +941,7 @@ export const getDashboard = createServerFn({ method: "GET" })
       countOf(base().eq("active", true).lt("expires_at", today)),
       countOf(base().eq("active", true).is("expires_at", null)),
       countOf(base().eq("active", false)),
-      ctx.supabase.from("routines").select("id", { count: "exact", head: true }),
+      ctx.supabase.from("routines").select("id", { count: "exact", head: true }).is("group_id", null),
       sumPayments(ctx, monthStart, monthEnd),
     ]);
 
