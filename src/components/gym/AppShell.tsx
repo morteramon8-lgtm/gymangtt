@@ -14,6 +14,7 @@ import {
   CalendarCheck,
   Menu,
   X,
+  Wallet,
 } from "lucide-react";
 import { useState, type ReactNode } from "react";
 
@@ -23,6 +24,7 @@ import { formatLongDate } from "@/lib/dates";
 import { SOON_DAYS } from "@/lib/gym-shared";
 import { NotificationBell } from "./NotificationBell";
 import { BrandLogo } from "./BrandLogo";
+import { SubscriptionBanner } from "./SubscriptionBanner";
 
 /**
  * Días de aviso configurados en Avisos. Todas las pantallas cuentan
@@ -74,6 +76,7 @@ const ADMIN_LINKS: { section: string; items: NavLink[] }[] = [
     section: "Sistema",
     items: [
       { to: "/configuracion", label: "Configuración", note: "Sistema", icon: <Settings className="nav-icon" /> },
+      { to: "/suscripcion", label: "Suscripción", note: "GYMANGT", icon: <Wallet className="nav-icon" /> },
     ],
   },
 ];
@@ -165,7 +168,7 @@ export function AppShell({
             <span className="topbar-date">{formatLongDate(me?.today)}</span>
           </div>
         </div>
-        <div className="gym-content">{children}</div>
+        <div className="gym-content">{me?.role === "admin" ? <SubscriptionBanner /> : null}{children}</div>
       </main>
     </div>
   );
