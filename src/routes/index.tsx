@@ -69,18 +69,17 @@ function AuthPage() {
     setNotice(null);
     setLoading(true);
     try {
-   if (mode === "signup") {
-     await setupGymFn({ data: { email, password, full_name: fullName } });
-     const { error: resendError } = await supabase.auth.resend({
-       type: "signup",
-       email,
-       options: { emailRedirectTo: `${window.location.origin}/` },
-     });
-     if (resendError) throw resendError;
-     setMode("login");
-     setNotice("Te enviamos un email para confirmar tu cuenta. Revisá tu bandeja de entrada y el correo no deseado. Cuando confirmes, iniciá sesión.");
-     return;
-   }
+      if (mode === "signup") {
+        await setupGymFn({ data: { email, password, full_name: fullName } });
+        const { error: resendError } = await supabase.auth.resend({
+          type: "signup",
+          email,
+          options: { emailRedirectTo: `${window.location.origin}/` },
+        });
+        if (resendError) throw resendError;
+        setMode("login");
+        setNotice("Te enviamos un email para confirmar tu cuenta. Revisá tu bandeja de entrada y el correo no deseado. Cuando confirmes, iniciá sesión.");
+        return;
       }
       const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
       if (signInError) throw signInError;
