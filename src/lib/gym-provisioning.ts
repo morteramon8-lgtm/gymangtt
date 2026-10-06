@@ -234,7 +234,7 @@ export async function provisionMember(params: {
         {
           email: fields.email,
           password,
-          email_confirm: true,
+          email_confirm: false,
           user_metadata: { full_name: `${fields.first_name} ${fields.last_name}` },
         },
         "member",
