@@ -142,7 +142,7 @@ export async function provisionGym(
     {
       email: data.email,
       password: data.password,
-      email_confirm: true,
+      email_confirm: false,
       user_metadata: { full_name: data.full_name },
     },
     "gym",
@@ -234,7 +234,7 @@ export async function provisionMember(params: {
         {
           email: fields.email,
           password,
-          email_confirm: false,
+          email_confirm: true,
           user_metadata: { full_name: `${fields.first_name} ${fields.last_name}` },
         },
         "member",
