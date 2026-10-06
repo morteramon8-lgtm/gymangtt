@@ -16,7 +16,7 @@ export type SubRow = {
 export type SubAccess = {
   /** Estado efectivo que ve el dueño. */
   state: SubStatus;
-  /** true = puede operar. (Hoy sólo informa; el bloqueo es una fase posterior.) */
+  /** true = puede operar. false = el sistema se bloquea (servidor + pantalla). */
   allowed: boolean;
   /** Días que faltan de prueba / de gracia / hasta el fin del período. */
   daysLeft: number | null;
@@ -56,6 +56,19 @@ export function subscriptionAccess(sub: SubRow | null, now: Date = new Date()): 
     default:
       return { state: "expired", allowed: false, daysLeft: 0 };
   }
+}
+
+/**
+ * Suscripción marcada "activa" pero cuyo período terminó hace más de GRACE_DAYS:
+ * señal de que probablemente se perdió un aviso (webhook) de Mercado Pago.
+ * El servidor consulta entonces el estado real antes de decidir.
+ */
+export function isActiveLapsed(
+  sub: Pick<SubRow, "status" | "current_period_end"> | null,
+  now: Date = new Date(),
+): boolean {
+  if (!sub || sub.status !== "active" || !sub.current_period_end) return false;
+  return now.getTime() > new Date(sub.current_period_end).getTime() + GRACE_DAYS * DAY;
 }
 
 export const arsMoney = (n: number | string) =>
