@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requireActiveSubscription } from "@/integrations/supabase/subscription-middleware";
 import { z } from "zod";
 
 import type { Json } from "@/integrations/supabase/types";
@@ -67,7 +67,7 @@ async function signedPhoto(
 /* ------------------------------------------------------------------ lectura */
 
 export const listGroups = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireActiveSubscription])
   .handler(async ({ context }) => {
     const ctx = context as unknown as Ctx;
     // RLS: el socio ve sólo sus grupos; el administrador, los de su gimnasio.
@@ -97,7 +97,7 @@ export const listGroups = createServerFn({ method: "GET" })
   });
 
 export const getGroup = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireActiveSubscription])
   .inputValidator((d) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
     const ctx = context as unknown as Ctx;
@@ -182,7 +182,7 @@ export const getGroup = createServerFn({ method: "GET" })
 
 /** Busca socios del PROPIO gimnasio para invitar. El gimnasio sale de la sesión, no del cliente. */
 export const searchGroupCandidates = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireActiveSubscription])
   .inputValidator((d) =>
     z
       .object({
@@ -206,7 +206,7 @@ export const searchGroupCandidates = createServerFn({ method: "GET" })
 /* ---------------------------------------------------------------- escritura */
 
 export const createGroup = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireActiveSubscription])
   .inputValidator((d) =>
     z.object({ name: zGroupName, description: zGroupDescription, inviteUserIds: zUserIds }).parse(d),
   )
@@ -223,7 +223,7 @@ export const createGroup = createServerFn({ method: "POST" })
   });
 
 export const updateGroup = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireActiveSubscription])
   .inputValidator((d) =>
     z.object({ id: z.string().uuid(), name: zGroupName, description: zGroupDescription }).parse(d),
   )
@@ -240,7 +240,7 @@ export const updateGroup = createServerFn({ method: "POST" })
   });
 
 export const deleteGroup = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireActiveSubscription])
   .inputValidator((d) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
     const ctx = context as unknown as Ctx;
@@ -249,7 +249,7 @@ export const deleteGroup = createServerFn({ method: "POST" })
   });
 
 export const inviteToGroup = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireActiveSubscription])
   .inputValidator((d) =>
     z.object({ groupId: z.string().uuid(), userIds: zUserIds.min(1, "Elegí al menos una persona.") }).parse(d),
   )
@@ -262,7 +262,7 @@ export const inviteToGroup = createServerFn({ method: "POST" })
   });
 
 export const respondGroupInvitation = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireActiveSubscription])
   .inputValidator((d) => z.object({ invitationId: z.string().uuid(), accept: z.boolean() }).parse(d))
   .handler(async ({ data, context }) => {
     const ctx = context as unknown as Ctx;
@@ -276,7 +276,7 @@ export const respondGroupInvitation = createServerFn({ method: "POST" })
   });
 
 export const cancelGroupInvitation = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireActiveSubscription])
   .inputValidator((d) => z.object({ invitationId: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
     const ctx = context as unknown as Ctx;
@@ -285,7 +285,7 @@ export const cancelGroupInvitation = createServerFn({ method: "POST" })
   });
 
 export const leaveGroup = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireActiveSubscription])
   .inputValidator((d) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
     const ctx = context as unknown as Ctx;
@@ -296,7 +296,7 @@ export const leaveGroup = createServerFn({ method: "POST" })
   });
 
 export const removeGroupMember = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireActiveSubscription])
   .inputValidator((d) => z.object({ groupId: z.string().uuid(), userId: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
     const ctx = context as unknown as Ctx;
@@ -320,7 +320,7 @@ const zGroupRoutine = z.object({
 
 /** Crea (o edita, si trae `id`) una rutina del grupo. Reglas de acceso: en la base de datos. */
 export const saveGroupRoutine = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireActiveSubscription])
   .inputValidator((d) => zGroupRoutine.parse(d))
   .handler(async ({ data, context }) => {
     const ctx = context as unknown as Ctx;
@@ -354,7 +354,7 @@ export const saveGroupRoutine = createServerFn({ method: "POST" })
   });
 
 export const deleteGroupRoutine = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireActiveSubscription])
   .inputValidator((d) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
     const ctx = context as unknown as Ctx;

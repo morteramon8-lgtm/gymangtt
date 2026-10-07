@@ -62,6 +62,19 @@ export const getSubscription = createServerFn({ method: "GET" })
     };
   });
 
+/**
+ * ¿Puede este usuario (administrador o socio) usar el sistema? No está bloqueada
+ * por la suscripción: es lo que consulta la pantalla de bloqueo.
+ */
+export const getAccessStatus = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const ctx = context as unknown as Ctx;
+    const { resolveGymAccess } = await import("./subscription-guard.server");
+    const a = await resolveGymAccess(ctx);
+    return { allowed: a.allowed, state: a.state, daysLeft: a.daysLeft, role: a.role };
+  });
+
 /** Crea (o reutiliza) la suscripción en Mercado Pago y devuelve el link de pago. */
 export const startSubscription = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
