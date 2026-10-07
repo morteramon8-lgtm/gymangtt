@@ -45,10 +45,7 @@ function SubscriptionPage() {
   // Al volver de Mercado Pago el aviso (webhook) puede tardar unos segundos.
   useEffect(() => {
     if (new URLSearchParams(window.location.search).has("preapproval_id")) {
-      const t = setInterval(() => {
-        void queryClient.invalidateQueries({ queryKey: ["subscription"] });
-        void queryClient.invalidateQueries({ queryKey: ["access"] }); // desbloquea apenas entra el pago
-      }, 4000);
+      const t = setInterval(() => void queryClient.invalidateQueries({ queryKey: ["subscription"] }), 4000);
       const stop = setTimeout(() => clearInterval(t), 60_000);
       return () => {
         clearInterval(t);
@@ -67,10 +64,7 @@ function SubscriptionPage() {
 
   const cancel = useMutation({
     mutationFn: () => cancelFn(),
-    onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ["subscription"] });
-      void queryClient.invalidateQueries({ queryKey: ["access"] });
-    },
+    onSuccess: () => void queryClient.invalidateQueries({ queryKey: ["subscription"] }),
     onError: (e) => setError(e instanceof Error ? e.message : "No se pudo cancelar."),
   });
 

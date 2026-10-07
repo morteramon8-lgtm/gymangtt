@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { isActiveLapsed, subscriptionAccess, type SubRow } from "./billing-shared";
+import { subscriptionAccess, type SubRow } from "./billing-shared";
 
 const base: SubRow = {
   status: "trial",
@@ -37,20 +37,5 @@ describe("subscriptionAccess", () => {
   });
   it("sin fila no bloquea", () => {
     expect(subscriptionAccess(null, now).allowed).toBe(true);
-  });
-});
-
-describe("isActiveLapsed", () => {
-  const active: SubRow = { ...base, status: "active", current_period_end: "2026-10-01T00:00:00Z" };
-  it("activa con el período vencido hace más de 7 días: hay que verificar con Mercado Pago", () => {
-    expect(isActiveLapsed(active, new Date("2026-10-09T00:00:00Z"))).toBe(true);
-  });
-  it("dentro de los 7 días de margen no", () => {
-    expect(isActiveLapsed(active, new Date("2026-10-05T00:00:00Z"))).toBe(false);
-  });
-  it("otros estados o sin fecha no aplican", () => {
-    expect(isActiveLapsed({ ...active, current_period_end: null }, now)).toBe(false);
-    expect(isActiveLapsed({ ...active, status: "trial" }, new Date("2026-12-01T00:00:00Z"))).toBe(false);
-    expect(isActiveLapsed(null, now)).toBe(false);
   });
 });

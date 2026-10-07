@@ -1,6 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { requireActiveSubscription } from "@/integrations/supabase/subscription-middleware";
 import { z } from "zod";
 import { passwordSchema } from "./validation";
 
@@ -141,7 +140,7 @@ async function signedPhoto(
 }
 
 export const listMembers = createServerFn({ method: "GET" })
-  .middleware([requireActiveSubscription])
+  .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const ctx = context as unknown as Ctx;
     await assertAdmin(ctx);
@@ -154,7 +153,7 @@ export const listMembers = createServerFn({ method: "GET" })
   });
 
 export const getMember = createServerFn({ method: "GET" })
-  .middleware([requireActiveSubscription])
+  .middleware([requireSupabaseAuth])
   .inputValidator((d) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
     const ctx = context as unknown as Ctx;
@@ -285,7 +284,7 @@ async function assertNoDuplicate(
 }
 
 export const createMember = createServerFn({ method: "POST" })
-  .middleware([requireActiveSubscription])
+  .middleware([requireSupabaseAuth])
   .inputValidator((d) =>
     memberInput
       .extend({
@@ -315,7 +314,7 @@ export const createMember = createServerFn({ method: "POST" })
   });
 
 export const updateMember = createServerFn({ method: "POST" })
-  .middleware([requireActiveSubscription])
+  .middleware([requireSupabaseAuth])
   .inputValidator((d) => memberInput.extend({ id: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
     const ctx = context as unknown as Ctx;
@@ -334,7 +333,7 @@ export const updateMember = createServerFn({ method: "POST" })
   });
 
 export const deleteMember = createServerFn({ method: "POST" })
-  .middleware([requireActiveSubscription])
+  .middleware([requireSupabaseAuth])
   .inputValidator((d) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
     const ctx = context as unknown as Ctx;
@@ -358,7 +357,7 @@ export const deleteMember = createServerFn({ method: "POST" })
 /* -------------------------------------------------------------------- plans */
 
 export const listPlans = createServerFn({ method: "GET" })
-  .middleware([requireActiveSubscription])
+  .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const ctx = context as unknown as Ctx;
     const rows = unwrap(
@@ -368,7 +367,7 @@ export const listPlans = createServerFn({ method: "GET" })
   });
 
 export const savePlan = createServerFn({ method: "POST" })
-  .middleware([requireActiveSubscription])
+  .middleware([requireSupabaseAuth])
   .inputValidator((d) =>
     z
       .object({
@@ -422,7 +421,7 @@ export const savePlan = createServerFn({ method: "POST" })
   });
 
 export const deletePlan = createServerFn({ method: "POST" })
-  .middleware([requireActiveSubscription])
+  .middleware([requireSupabaseAuth])
   .inputValidator((d) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
     const ctx = context as unknown as Ctx;
@@ -435,7 +434,7 @@ export const deletePlan = createServerFn({ method: "POST" })
 /* ----------------------------------------------------------------- settings */
 
 export const getSettings = createServerFn({ method: "GET" })
-  .middleware([requireActiveSubscription])
+  .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const ctx = context as unknown as Ctx;
     return unwrap(
@@ -448,7 +447,7 @@ export const getSettings = createServerFn({ method: "GET" })
   });
 
 export const saveSettings = createServerFn({ method: "POST" })
-  .middleware([requireActiveSubscription])
+  .middleware([requireSupabaseAuth])
   .inputValidator((d) =>
     z
       .object({
@@ -490,7 +489,7 @@ export const saveSettings = createServerFn({ method: "POST" })
 /* ----------------------------------------------------------------- payments */
 
 export const listPayments = createServerFn({ method: "GET" })
-  .middleware([requireActiveSubscription])
+  .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const ctx = context as unknown as Ctx;
     await assertAdmin(ctx);
@@ -511,7 +510,7 @@ export const listPayments = createServerFn({ method: "GET" })
  * recalcula el vencimiento. Si algo falla, no queda nada a medias.
  */
 export const registerPayment = createServerFn({ method: "POST" })
-  .middleware([requireActiveSubscription])
+  .middleware([requireSupabaseAuth])
   .inputValidator((d) =>
     z
       .object({
@@ -544,7 +543,7 @@ export const registerPayment = createServerFn({ method: "POST" })
 
 /** Anulación lógica: el pago queda en la base con quién, cuándo y por qué. */
 export const deletePayment = createServerFn({ method: "POST" })
-  .middleware([requireActiveSubscription])
+  .middleware([requireSupabaseAuth])
   .inputValidator((d) =>
     z
       .object({
@@ -565,7 +564,7 @@ export const deletePayment = createServerFn({ method: "POST" })
 /* ----------------------------------------------------------------- routines */
 
 export const listRoutines = createServerFn({ method: "GET" })
-  .middleware([requireActiveSubscription])
+  .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const ctx = context as unknown as Ctx;
     await assertAdmin(ctx);
@@ -582,7 +581,7 @@ export const listRoutines = createServerFn({ method: "GET" })
   });
 
 export const saveRoutine = createServerFn({ method: "POST" })
-  .middleware([requireActiveSubscription])
+  .middleware([requireSupabaseAuth])
   .inputValidator((d) =>
     z
       .object({
@@ -680,7 +679,7 @@ async function routineNotificationsOn(ctx: Ctx): Promise<boolean> {
 }
 
 export const deleteRoutine = createServerFn({ method: "POST" })
-  .middleware([requireActiveSubscription])
+  .middleware([requireSupabaseAuth])
   .inputValidator((d) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
     const ctx = context as unknown as Ctx;
@@ -713,7 +712,7 @@ async function myMemberId(ctx: Ctx): Promise<string> {
 }
 
 export const listMyRoutines = createServerFn({ method: "GET" })
-  .middleware([requireActiveSubscription])
+  .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const ctx = context as unknown as Ctx;
     const memberId = await myMemberId(ctx);
@@ -730,7 +729,7 @@ export const listMyRoutines = createServerFn({ method: "GET" })
   });
 
 export const saveMyRoutine = createServerFn({ method: "POST" })
-  .middleware([requireActiveSubscription])
+  .middleware([requireSupabaseAuth])
   .inputValidator((d) => zMyRoutine.parse(d))
   .handler(async ({ data, context }) => {
     const ctx = context as unknown as Ctx;
@@ -780,7 +779,7 @@ export const saveMyRoutine = createServerFn({ method: "POST" })
   });
 
 export const deleteMyRoutine = createServerFn({ method: "POST" })
-  .middleware([requireActiveSubscription])
+  .middleware([requireSupabaseAuth])
   .inputValidator((d) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
     const ctx = context as unknown as Ctx;
@@ -799,7 +798,7 @@ export const deleteMyRoutine = createServerFn({ method: "POST" })
   });
 
 export const assignRoutine = createServerFn({ method: "POST" })
-  .middleware([requireActiveSubscription])
+  .middleware([requireSupabaseAuth])
   .inputValidator((d) =>
     z
       .object({
@@ -893,7 +892,7 @@ async function soonDaysOf(ctx: Ctx): Promise<number> {
 }
 
 export const getDashboard = createServerFn({ method: "GET" })
-  .middleware([requireActiveSubscription])
+  .middleware([requireSupabaseAuth])
   .inputValidator((d) =>
     z
       .object({
@@ -1018,7 +1017,7 @@ export const getDashboard = createServerFn({ method: "GET" })
 /* ------------------------------------------------------------ portal socio */
 
 export const getMyPortal = createServerFn({ method: "GET" })
-  .middleware([requireActiveSubscription])
+  .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const ctx = context as unknown as Ctx;
     const member = unwrap(
@@ -1105,7 +1104,7 @@ export const setupGym = createServerFn({ method: "POST" })
 /* --------------------------------------------------------------- asistencias */
 
 export const markAttendance = createServerFn({ method: "POST" })
-  .middleware([requireActiveSubscription])
+  .middleware([requireSupabaseAuth])
   .inputValidator((d) =>
     z
       .object({
@@ -1138,7 +1137,7 @@ export const markAttendance = createServerFn({ method: "POST" })
  * gimnasio y fecha a partir de la sesión: no se acepta ningún dato del cliente.
  */
 export const checkInMyself = createServerFn({ method: "POST" })
-  .middleware([requireActiveSubscription])
+  .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const ctx = context as unknown as Ctx;
     const res = await ctx.supabase.rpc("member_check_in");
@@ -1147,7 +1146,7 @@ export const checkInMyself = createServerFn({ method: "POST" })
   });
 
 export const listMyAttendance = createServerFn({ method: "GET" })
-  .middleware([requireActiveSubscription])
+  .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const ctx = context as unknown as Ctx;
     const me = unwrap(
@@ -1167,7 +1166,7 @@ export const listMyAttendance = createServerFn({ method: "GET" })
 
 /** Todas las asistencias del gimnasio del administrador (RLS limita al gimnasio). */
 export const listGymAttendance = createServerFn({ method: "GET" })
-  .middleware([requireActiveSubscription])
+  .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const ctx = context as unknown as Ctx;
     await assertAdmin(ctx);
@@ -1183,7 +1182,7 @@ export const listGymAttendance = createServerFn({ method: "GET" })
   });
 
 export const removeAttendance = createServerFn({ method: "POST" })
-  .middleware([requireActiveSubscription])
+  .middleware([requireSupabaseAuth])
   .inputValidator((d) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
     const ctx = context as unknown as Ctx;
@@ -1196,7 +1195,7 @@ export const removeAttendance = createServerFn({ method: "POST" })
 /* ------------------------------------------------------------------ progreso */
 
 export const addProgress = createServerFn({ method: "POST" })
-  .middleware([requireActiveSubscription])
+  .middleware([requireSupabaseAuth])
   .inputValidator((d) =>
     z
       .object({
@@ -1235,7 +1234,7 @@ export const addProgress = createServerFn({ method: "POST" })
   });
 
 export const removeProgress = createServerFn({ method: "POST" })
-  .middleware([requireActiveSubscription])
+  .middleware([requireSupabaseAuth])
   .inputValidator((d) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
     const ctx = context as unknown as Ctx;
@@ -1270,7 +1269,7 @@ function isRealImage(bytes: Buffer, contentType: string): boolean {
 const PNG_MAGIC = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
 
 export const setMemberPhoto = createServerFn({ method: "POST" })
-  .middleware([requireActiveSubscription])
+  .middleware([requireSupabaseAuth])
   .inputValidator((d) =>
     z
       .object({
@@ -1374,7 +1373,7 @@ async function removeMemberPhotoFiles(gymId: string, memberId: string) {
  * las fotos que ya no están enlazadas a ninguna ficha de socio.
  */
 export const cleanupMemberPhotos = createServerFn({ method: "POST" })
-  .middleware([requireActiveSubscription])
+  .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const ctx = context as unknown as Ctx;
     await assertAdmin(ctx);

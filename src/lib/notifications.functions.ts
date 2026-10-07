@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import { requireActiveSubscription } from "@/integrations/supabase/subscription-middleware";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
 
 import { nowTimestamp } from "./dates";
@@ -77,7 +77,7 @@ export async function pushNotifications(ctx: Ctx, items: NewNotification[]): Pro
 /* ------------------------------------------------------------- ajustes */
 
 export const getNotificationSettings = createServerFn({ method: "GET" })
-  .middleware([requireActiveSubscription])
+  .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const ctx = context as unknown as Ctx;
     return unwrap(
@@ -90,7 +90,7 @@ export const getNotificationSettings = createServerFn({ method: "GET" })
   });
 
 export const saveNotificationSettings = createServerFn({ method: "POST" })
-  .middleware([requireActiveSubscription])
+  .middleware([requireSupabaseAuth])
   .inputValidator((d) =>
     z
       .object({
@@ -124,7 +124,7 @@ export const saveNotificationSettings = createServerFn({ method: "POST" })
  * Sólo crea avisos nuevos: los ya generados no se duplican.
  */
 export const runExpiryScan = createServerFn({ method: "POST" })
-  .middleware([requireActiveSubscription])
+  .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const ctx = context as unknown as Ctx;
     await assertAdmin(ctx);
@@ -150,7 +150,7 @@ export const runExpiryScan = createServerFn({ method: "POST" })
 /* --------------------------------------------------------- lectura de datos */
 
 export const listNotifications = createServerFn({ method: "GET" })
-  .middleware([requireActiveSubscription])
+  .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const ctx = context as unknown as Ctx;
     await assertAdmin(ctx);
@@ -186,7 +186,7 @@ export const listNotifications = createServerFn({ method: "GET" })
   });
 
 export const myNotifications = createServerFn({ method: "GET" })
-  .middleware([requireActiveSubscription])
+  .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const ctx = context as unknown as Ctx;
     const rows =
@@ -216,7 +216,7 @@ export const myNotifications = createServerFn({ method: "GET" })
   });
 
 export const markNotificationRead = createServerFn({ method: "POST" })
-  .middleware([requireActiveSubscription])
+  .middleware([requireSupabaseAuth])
   .inputValidator((d) => z.object({ id: z.string().uuid().optional() }).parse(d))
   .handler(async ({ data, context }) => {
     const ctx = context as unknown as Ctx;
