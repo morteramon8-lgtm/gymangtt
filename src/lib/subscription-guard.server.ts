@@ -49,6 +49,14 @@ export async function resolveGymAccess(ctx: Ctx, opts: { useCache?: boolean } = 
   try {
     let sub = await readSub(gym);
 
+    // Gimnasio sin fila de suscripción (p. ej. creado antes de existir el trigger):
+    // se le crea su período de prueba. Sin esto quedaría gratis y sin bloqueo para siempre.
+    if (!sub) {
+      const { error: insErr } = await db().from("gym_subscriptions").upsert({ gym_id: gym }, { onConflict: "gym_id", ignoreDuplicates: true });
+      if (insErr) console.error("[subscription-guard] no se pudo crear la suscripción de prueba", insErr.message);
+      else sub = await readSub(gym);
+    }
+
     // "Activa" pero con el período vencido hace días: puede haberse perdido un aviso de MP.
     if (sub && isActiveLapsed(sub) && sub.mp_preapproval_id) {
       const last = lastReconcile.get(gym) ?? 0;

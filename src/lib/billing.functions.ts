@@ -89,7 +89,7 @@ export const startSubscription = createServerFn({ method: "POST" })
 
     const { data: sub, error } = await admin
       .from("gym_subscriptions")
-      .select("status, mp_preapproval_id")
+      .select("status, mp_preapproval_id, price_ars")
       .eq("gym_id", gymId)
       .maybeSingle();
     if (error) throw new Error(error.message);
@@ -113,6 +113,7 @@ export const startSubscription = createServerFn({ method: "POST" })
       gymId,
       payerEmail: data.payerEmail,
       gymName: (gym?.name as string | undefined) ?? "Gimnasio",
+      priceArs: Number(sub.price_ars) > 0 ? Number(sub.price_ars) : undefined, // cobra lo mismo que muestra la pantalla
     });
     if (!pre.init_point) throw new Error("Mercado Pago no devolvió el link de pago.");
 
