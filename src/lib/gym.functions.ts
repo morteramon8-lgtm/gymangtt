@@ -1093,12 +1093,17 @@ export const setupGym = createServerFn({ method: "POST" })
         password: passwordSchema,
         full_name: z.string().min(1, "Ingresá tu nombre y apellido"),
         gym_name: z.string().min(1).max(120).optional(),
+        turnstile_token: z.string().max(4096).optional(),
       })
       .parse(d),
   )
   .handler(async ({ data }) => {
+    // Antispam: comprueba con Cloudflare que quien se registra no es un robot.
+    const { verifyTurnstile } = await import("@/lib/turnstile.server");
+    await verifyTurnstile(data.turnstile_token);
+    const { turnstile_token: _turnstileToken, ...gymData } = data;
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    await provisionGym(supabaseAdmin as unknown as AdminLike, data);
+    await provisionGym(supabaseAdmin as unknown as AdminLike, gymData);
     return { ok: true };
   });
 
