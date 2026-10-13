@@ -12,6 +12,8 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as RecuperarRouteImport } from './routes/recuperar'
+import { Route as PrivacidadRouteImport } from './routes/privacidad'
+import { Route as TerminosRouteImport } from './routes/terminos'
 import { Route as AuthenticatedAsistenciasRouteImport } from './routes/_authenticated/asistencias'
 import { Route as AuthenticatedAvisosRouteImport } from './routes/_authenticated/avisos'
 import { Route as AuthenticatedConfiguracionRouteImport } from './routes/_authenticated/configuracion'
@@ -39,6 +41,16 @@ const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
 const RecuperarRoute = RecuperarRouteImport.update({
   id: '/recuperar',
   path: '/recuperar',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacidadRoute = PrivacidadRouteImport.update({
+  id: '/privacidad',
+  path: '/privacidad',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TerminosRoute = TerminosRouteImport.update({
+  id: '/terminos',
+  path: '/terminos',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedAsistenciasRoute =
@@ -117,6 +129,8 @@ const AuthenticatedSociosIdRoute = AuthenticatedSociosIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/recuperar': typeof RecuperarRoute
+  '/privacidad': typeof PrivacidadRoute
+  '/terminos': typeof TerminosRoute
   '/asistencias': typeof AuthenticatedAsistenciasRoute
   '/avisos': typeof AuthenticatedAvisosRoute
   '/configuracion': typeof AuthenticatedConfiguracionRoute
@@ -135,6 +149,8 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/recuperar': typeof RecuperarRoute
+  '/privacidad': typeof PrivacidadRoute
+  '/terminos': typeof TerminosRoute
   '/asistencias': typeof AuthenticatedAsistenciasRoute
   '/avisos': typeof AuthenticatedAvisosRoute
   '/configuracion': typeof AuthenticatedConfiguracionRoute
@@ -155,6 +171,8 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/recuperar': typeof RecuperarRoute
+  '/privacidad': typeof PrivacidadRoute
+  '/terminos': typeof TerminosRoute
   '/_authenticated/asistencias': typeof AuthenticatedAsistenciasRoute
   '/_authenticated/avisos': typeof AuthenticatedAvisosRoute
   '/_authenticated/configuracion': typeof AuthenticatedConfiguracionRoute
@@ -175,6 +193,8 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/recuperar'
+    | '/privacidad'
+    | '/terminos'
     | '/asistencias'
     | '/avisos'
     | '/configuracion'
@@ -193,6 +213,8 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/recuperar'
+    | '/privacidad'
+    | '/terminos'
     | '/asistencias'
     | '/avisos'
     | '/configuracion'
@@ -212,6 +234,8 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/recuperar'
+    | '/privacidad'
+    | '/terminos'
     | '/_authenticated/asistencias'
     | '/_authenticated/avisos'
     | '/_authenticated/configuracion'
@@ -232,6 +256,8 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   RecuperarRoute: typeof RecuperarRoute
+  PrivacidadRoute: typeof PrivacidadRoute
+  TerminosRoute: typeof TerminosRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -255,6 +281,20 @@ declare module '@tanstack/react-router' {
       path: '/recuperar'
       fullPath: '/recuperar'
       preLoaderRoute: typeof RecuperarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacidad': {
+      id: '/privacidad'
+      path: '/privacidad'
+      fullPath: '/privacidad'
+      preLoaderRoute: typeof PrivacidadRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terminos': {
+      id: '/terminos'
+      path: '/terminos'
+      fullPath: '/terminos'
+      preLoaderRoute: typeof TerminosRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/asistencias': {
@@ -399,6 +439,8 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   RecuperarRoute: RecuperarRoute,
+  PrivacidadRoute: PrivacidadRoute,
+  TerminosRoute: TerminosRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

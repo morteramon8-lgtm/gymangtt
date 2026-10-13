@@ -1,10 +1,12 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
 
 import { supabase } from "@/integrations/supabase/client";
 import { getMe, gymSetupStatus, setupGym } from "@/lib/gym.functions";
 import { BrandLogo } from "@/components/gym/BrandLogo";
+import { TurnstileWidget } from "@/components/gym/TurnstileWidget";
+import { mailtoLink } from "@/lib/legal-config";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -27,6 +29,8 @@ export const Route = createFileRoute("/")({
   component: AuthPage,
 });
 
+const TURNSTILE_SITE_KEY = import.meta.env["VITE_TURNSTILE_SITE_KEY"] as string | undefined;
+
 function AuthPage() {
   const navigate = useNavigate();
   const me = useServerFn(getMe);
@@ -41,6 +45,9 @@ function AuthPage() {
   const [notice, setNotice] = useState<string | null>(null);
   const [needsSetup, setNeedsSetup] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const [turnstileReset, setTurnstileReset] = useState(0);
 
   async function goToApp() {
     try {
@@ -70,7 +77,20 @@ function AuthPage() {
     setLoading(true);
     try {
       if (mode === "signup") {
-        await setupGymFn({ data: { email, password, full_name: fullName } });
+        if (!acceptedTerms) {
+          throw new Error("Tenés que aceptar los Términos y Condiciones y la Política de Privacidad para crear tu cuenta.");
+        }
+        if (TURNSTILE_SITE_KEY && !turnstileToken) {
+          throw new Error("Completá la verificación de seguridad antes de continuar.");
+        }
+        await setupGymFn({
+          data: {
+            email,
+            password,
+            full_name: fullName,
+            turnstile_token: turnstileToken ?? undefined,
+          },
+        });
         const { error: resendError } = await supabase.auth.resend({
           type: "signup",
           email,
@@ -86,6 +106,8 @@ function AuthPage() {
       await goToApp();
     } catch (err) {
       setError(err instanceof Error ? err.message : "No pudimos iniciar sesión.");
+      // El código de verificación sirve una sola vez: pedimos uno nuevo.
+      setTurnstileReset((n) => n + 1);
     } finally {
       setLoading(false);
     }
@@ -192,6 +214,36 @@ function AuthPage() {
                 required
               />
             </div>
+            {mode === "signup" && role === "admin" ? (
+              <label
+                style={{ display: "flex", gap: 8, alignItems: "flex-start", fontSize: 13, marginBottom: 12 }}
+              >
+                <input
+                  type="checkbox"
+                  checked={acceptedTerms}
+                  onChange={(e) => setAcceptedTerms(e.target.checked)}
+                  style={{ marginTop: 3 }}
+                />
+                <span>
+                  Leí y acepto los{" "}
+                  <a href="/terminos" target="_blank" rel="noopener noreferrer" style={{ textDecoration: "underline" }}>
+                    Términos y Condiciones
+                  </a>{" "}
+                  y la{" "}
+                  <a href="/privacidad" target="_blank" rel="noopener noreferrer" style={{ textDecoration: "underline" }}>
+                    Política de Privacidad
+                  </a>
+                  .
+                </span>
+              </label>
+            ) : null}
+            {mode === "signup" && role === "admin" && TURNSTILE_SITE_KEY ? (
+              <TurnstileWidget
+                siteKey={TURNSTILE_SITE_KEY}
+                onToken={setTurnstileToken}
+                resetKey={turnstileReset}
+              />
+            ) : null}
             {error ? <div className="alert badge-red">{error}</div> : null}
             <button className="btn btn-primary" type="submit" disabled={loading}>
               {loading
@@ -229,6 +281,36 @@ function AuthPage() {
             </p>
           </div>
         </form>
+        <nav
+          aria-label="Información legal"
+          className="muted text-xs"
+          style={{ display: "flex", flexWrap: "wrap", gap: "8px 16px", justifyContent: "center", marginTop: 16 }}
+        >
+          <Link to="/terminos" style={{ textDecoration: "underline" }}>
+            Términos y Condiciones
+          </Link>
+          <Link to="/privacidad" style={{ textDecoration: "underline" }}>
+            Política de Privacidad
+          </Link>
+          <a
+            href={mailtoLink(
+              "Botón de baja de servicio - GYMANGT",
+              "Solicito la baja del servicio GYMANGT.\n\nNombre del gimnasio:\nEmail de la cuenta:\n",
+            )}
+            style={{ textDecoration: "underline" }}
+          >
+            Botón de baja de servicio
+          </a>
+          <a
+            href={mailtoLink(
+              "Botón de arrepentimiento - GYMANGT",
+              "Ejerzo mi derecho de arrepentimiento sobre la contratación de GYMANGT.\n\nNombre del gimnasio:\nEmail de la cuenta:\nFecha de contratación:\n",
+            )}
+            style={{ textDecoration: "underline" }}
+          >
+            Botón de arrepentimiento
+          </a>
+        </nav>
       </div>
     </div>
   );
