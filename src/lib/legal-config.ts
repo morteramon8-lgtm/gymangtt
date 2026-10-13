@@ -6,11 +6,11 @@
 export const LEGAL = {
   marca: "GYMANGT",
   sitio: "https://gymangt.com",
-  titular: "[Maximiliano Damian Morte Brizuela]",
-  cuit: "[20-48415571-3]",
-  domicilio: "[Sur B° Los Teros C. 7, Gral Mariano Acha Sur 5151 M. C, J5427 Pocito, San Juan]",
-  email: "[gymangtt@gmail.com]",
-  ciudadJurisdiccion: "[Ciudad de San Juan]",
+  titular: "Maximiliano Damian Morte Brizuela",
+  cuit: "20-48415571-3",
+  domicilio: "Sur B° Los Teros C. 7, Gral Mariano Acha Sur 5151 M. C, J5427 Pocito, San Juan",
+  email: "gymangtt@gmail.com",
+  ciudadJurisdiccion: "Ciudad de San Juan",
   // Valores propuestos: cambialos si querés otros.
   diasConservacion: "90", // días que se guardan los datos tras la baja o suspensión
   diasAvisoCambios: "30", // días de aviso antes de cambiar el precio
