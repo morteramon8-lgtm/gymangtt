@@ -148,3 +148,30 @@ export const cancelSubscription = createServerFn({ method: "POST" })
     await mpServer.syncPreapproval(sub.mp_preapproval_id as string);
     return { ok: true };
   });
+
+/**
+ * Consulta a Mercado Pago el estado REAL de la suscripción y actualiza la base.
+ * Sirve cuando un aviso (webhook) se pierde o todavía no está configurado.
+ */
+export const refreshSubscription = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const ctx = context as unknown as Ctx;
+    const gymId = await assertAdminAndGym(ctx);
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const mpServer = await import("./mercadopago.server");
+    const admin = supabaseAdmin as unknown as SupabaseClient;
+
+    const { data: sub } = await admin
+      .from("gym_subscriptions")
+      .select("mp_preapproval_id")
+      .eq("gym_id", gymId)
+      .maybeSingle();
+    const preapprovalId = (sub?.mp_preapproval_id as string | null | undefined) ?? null;
+    if (!preapprovalId) return { mpStatus: null as string | null };
+
+    const pre = await mpServer.getPreapproval(preapprovalId);
+    await mpServer.syncPreapproval(preapprovalId);
+    return { mpStatus: (pre.status ?? null) as string | null };
+  });

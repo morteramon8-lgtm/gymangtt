@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
 
 import { AppShell, Field } from "@/components/gym/AppShell";
-import { cancelSubscription, getSubscription, startSubscription } from "@/lib/billing.functions";
+import { cancelSubscription, getSubscription, refreshSubscription, startSubscription } from "@/lib/billing.functions";
 import { arsMoney } from "@/lib/billing-shared";
 
 export const Route = createFileRoute("/_authenticated/suscripcion")({
@@ -32,30 +32,38 @@ function SubscriptionPage() {
   const getFn = useServerFn(getSubscription);
   const startFn = useServerFn(startSubscription);
   const cancelFn = useServerFn(cancelSubscription);
+  const refreshFn = useServerFn(refreshSubscription);
   const queryClient = useQueryClient();
 
   const sub = useQuery({ queryKey: ["subscription"], queryFn: () => getFn() });
   const [email, setEmail] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [info, setInfo] = useState<string | null>(null);
 
   useEffect(() => {
     if (sub.data?.defaultEmail && !email) setEmail(sub.data.defaultEmail);
   }, [sub.data?.defaultEmail]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Al volver de Mercado Pago el aviso (webhook) puede tardar unos segundos.
+  // Al volver de Mercado Pago consultamos el estado real (no dependemos sólo del aviso/webhook).
   useEffect(() => {
     if (new URLSearchParams(window.location.search).has("preapproval_id")) {
-      const t = setInterval(() => {
-        void queryClient.invalidateQueries({ queryKey: ["subscription"] });
-        void queryClient.invalidateQueries({ queryKey: ["access"] }); // desbloquea apenas entra el pago
-      }, 4000);
+      const tick = () => {
+        void refreshFn()
+          .catch(() => undefined)
+          .finally(() => {
+            void queryClient.invalidateQueries({ queryKey: ["subscription"] });
+            void queryClient.invalidateQueries({ queryKey: ["access"] }); // desbloquea apenas entra el pago
+          });
+      };
+      tick();
+      const t = setInterval(tick, 4000);
       const stop = setTimeout(() => clearInterval(t), 60_000);
       return () => {
         clearInterval(t);
         clearTimeout(stop);
       };
     }
-  }, [queryClient]);
+  }, [queryClient]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const start = useMutation({
     mutationFn: () => startFn({ data: { payerEmail: email } }),
@@ -63,6 +71,20 @@ function SubscriptionPage() {
       window.location.href = url; // checkout de Mercado Pago
     },
     onError: (e) => setError(e instanceof Error ? e.message : "No se pudo iniciar la suscripción."),
+  });
+
+  const refresh = useMutation({
+    mutationFn: () => refreshFn(),
+    onSuccess: ({ mpStatus }) => {
+      void queryClient.invalidateQueries({ queryKey: ["subscription"] });
+      void queryClient.invalidateQueries({ queryKey: ["access"] });
+      setInfo(
+        mpStatus === "authorized"
+          ? "¡Listo! Mercado Pago confirmó el pago y tu suscripción está activa."
+          : "Mercado Pago todavía no confirma el pago. Si pagaste hace unos minutos, esperá un poco y volvé a probar.",
+      );
+    },
+    onError: (e) => setError(e instanceof Error ? e.message : "No se pudo verificar el estado."),
   });
 
   const cancel = useMutation({
@@ -82,6 +104,7 @@ function SubscriptionPage() {
   return (
     <AppShell title="Suscripción GYMANGT">
       {error ? <div className="alert">{error}</div> : null}
+      {info ? <div className="alert badge-green">{info}</div> : null}
       {sub.isLoading ? <div className="panel"><div className="panel-body">Cargando…</div></div> : null}
       {sub.isSuccess && !d ? (
         <div className="panel"><div className="panel-body">No hay datos de suscripción para tu gimnasio.</div></div>
@@ -124,6 +147,26 @@ function SubscriptionPage() {
                   {start.isPending ? "Redirigiendo…" : state === "expired" || state === "cancelled" ? "Reactivar suscripción" : "Activar suscripción"}
                 </button>
               </>
+            ) : null}
+
+            {d.hasMercadoPago && state !== "active" ? (
+              <div style={{ marginTop: 16 }}>
+                <p className="muted text-xs" style={{ margin: "0 0 8px" }}>
+                  ¿Ya pagaste en Mercado Pago y acá no figura activa?
+                </p>
+                <button
+                  className="btn btn-sm"
+                  type="button"
+                  disabled={refresh.isPending}
+                  onClick={() => {
+                    setError(null);
+                    setInfo(null);
+                    refresh.mutate();
+                  }}
+                >
+                  {refresh.isPending ? "Verificando…" : "Verificar estado del pago"}
+                </button>
+              </div>
             ) : null}
 
             {state === "active" ? (
