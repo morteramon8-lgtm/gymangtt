@@ -12,6 +12,10 @@ export const Route = createFileRoute("/_authenticated/suscripcion")({
     meta: [
       { title: "Suscripción — GYMANGT" },
       { name: "description", content: "Estado y administración de tu suscripción a GYMANGT." },
+      { property: "og:title", content: "Suscripción — GYMANGT" },
+      { property: "og:description", content: "Estado y administración de tu suscripción a GYMANGT." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: SubscriptionPage,
@@ -111,13 +115,21 @@ function SubscriptionPage() {
       ) : null}
 
       {d ? (
-        <div className="panel">
-          <div className="panel-head">Plan GYMANGT</div>
-          <div className="panel-body">
-            <p style={{ fontSize: 28, fontWeight: 700, margin: "0 0 4px" }}>
-              {arsMoney(d.priceArs)} <span style={{ fontSize: 14, fontWeight: 400 }}>/ mes</span>
+        <div className="panel subscription-vertical">
+          <div className="panel-head subscription-crown">
+            <div className="subscription-emblem" aria-hidden="true">
+              <span className="subscription-ring" />
+              <svg viewBox="0 0 100 100" className="subscription-dumbbell" fill="none">
+                <path d="M30 50h40M22 32v36M32 26v48M68 26v48M78 32v36" stroke="currentColor" strokeWidth="8" strokeLinecap="round" />
+              </svg>
+            </div>
+            <span>Plan GYMANGT</span>
+          </div>
+          <div className="panel-body subscription-details">
+            <p className="subscription-price">
+              {arsMoney(d.priceArs)} <span>/ mes</span>
             </p>
-            <p style={{ margin: "0 0 16px" }}>Todo incluido. Podés cancelar cuando quieras.</p>
+            <p className="subscription-summary">Todo incluido. Podés cancelar cuando quieras.</p>
 
             <p>
               Estado: <span className={label.badge}>{label.text}</span>
@@ -150,7 +162,7 @@ function SubscriptionPage() {
             ) : null}
 
             {d.hasMercadoPago && state !== "active" ? (
-              <div style={{ marginTop: 16 }}>
+              <div className="subscription-verification">
                 <p className="muted text-xs" style={{ margin: "0 0 8px" }}>
                   ¿Ya pagaste en Mercado Pago y acá no figura activa?
                 </p>
